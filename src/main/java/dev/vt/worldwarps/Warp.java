@@ -1,8 +1,6 @@
 package dev.vt.worldwarps;
 
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 
 import java.util.UUID;
 

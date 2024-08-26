@@ -19,12 +19,12 @@ public class WarpManager extends PersistentState {
         this.markDirty();
     }
 
-    public void removeWarp(String name, String owner) {
+    public void removeWarp(String name, UUID owner) {
         warps.removeIf(w -> w.getName().equals(name) && w.getOwner().equals(owner));
         this.markDirty();
     }
 
-    public List<Warp> getWarpsByOwner(String owner) {
+    public List<Warp> getWarpsByOwner(UUID owner) {
         return warps.stream().filter(w -> w.getOwner().equals(owner)).collect(Collectors.toList());
     }
 
@@ -36,7 +36,7 @@ public class WarpManager extends PersistentState {
         return warps.stream().filter(w -> w.getName().equals(name)).findFirst().orElse(null);
     }
 
-    public void toggleWarpType(String name, String owner) {
+    public void toggleWarpType(String name, UUID owner) {
         Warp warp = getWarp(name);
         if (warp != null && warp.getOwner().equals(owner)) {
             warp.setPublic(!warp.isPublic());
@@ -44,7 +44,7 @@ public class WarpManager extends PersistentState {
         this.markDirty();
     }
 
-    public void updateWarp(String name, String owner, Vec3d pos, float yaw, float pitch, String world) {
+    public void updateWarp(String name, UUID owner, Vec3d pos, float yaw, float pitch, String world) {
         Warp warp = getWarp(name);
         if (warp != null && warp.getOwner().equals(owner)) {
             warp.setPos(pos);
