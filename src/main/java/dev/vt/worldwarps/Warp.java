@@ -4,16 +4,18 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
+import java.util.UUID;
+
 public class Warp {
     private String name;
-    private String owner;
+    private UUID owner;
     private boolean isPublic;
     private Vec3d pos;
     private float yaw, pitch;
     private String world;
 
 
-    public Warp(String name, String owner, boolean isPublic, Vec3d pos, float yaw, float pitch, String world) {
+    public Warp(String name, UUID owner, boolean isPublic, Vec3d pos, float yaw, float pitch, String world) {
         this.name = name;
         this.owner = owner;
         this.isPublic = isPublic;
@@ -31,11 +33,11 @@ public class Warp {
         this.name = name;
     }
 
-    public String getOwner() {
+    public UUID getOwner() {
         return owner;
     }
 
-    public void setOwner(String owner) {
+    public void setOwner(UUID owner) {
         this.owner = owner;
     }
 

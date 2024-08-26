@@ -8,6 +8,7 @@ import net.minecraft.world.PersistentState;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class WarpManager extends PersistentState {
@@ -60,7 +61,7 @@ public class WarpManager extends PersistentState {
         warps.forEach(w -> {
             NbtCompound warpNbt = new NbtCompound();
             warpNbt.putString("name", w.getName());
-            warpNbt.putString("owner", w.getOwner());
+            warpNbt.putUuid("owner", w.getOwner());
             warpNbt.putBoolean("isPublic", w.isPublic());
             warpNbt.putDouble("x", w.getX());
             warpNbt.putDouble("y", w.getY());
@@ -80,7 +81,7 @@ public class WarpManager extends PersistentState {
         for (int i = 0; i < warpList.size(); i++) {
             NbtCompound warpNbt = warpList.getCompound(i);
             String name = warpNbt.getString("name");
-            String owner = warpNbt.getString("owner");
+            UUID owner = warpNbt.getUuid("owner");
             boolean isPublic = warpNbt.getBoolean("isPublic");
             double x = warpNbt.getDouble("x");
             double y = warpNbt.getDouble("y");
