@@ -9,7 +9,7 @@ version = "${version}"
 displayName = "WorldWarps"
 authors = "VeiTr"
 description = '''
-This is an example description! Tell everyone what your mod is about!
+A simple mod that allows you to create warps to different locations in the world.
 '''
 #logoFile = ""
 

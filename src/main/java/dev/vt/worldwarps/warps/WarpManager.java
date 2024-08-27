@@ -1,4 +1,4 @@
-package dev.vt.worldwarps;
+package dev.vt.worldwarps.warps;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;

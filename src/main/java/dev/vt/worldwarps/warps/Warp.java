@@ -1,4 +1,4 @@
-package dev.vt.worldwarps;
+package dev.vt.worldwarps.warps;
 
 import net.minecraft.util.math.Vec3d;
 
