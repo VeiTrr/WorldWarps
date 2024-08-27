@@ -5,41 +5,72 @@ import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.minecraft.command.argument.DimensionArgumentType;
+import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
+import java.util.Comparator;
+import java.util.List;
 import java.util.UUID;
 
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
 public class WarpCommand {
+    UUID CONSOLEID = UUID.fromString("00000000-0000-0000-0000-000000000000");
+
     public void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(literal("warp")
                 .then(argument("name", StringArgumentType.word())
                         .suggests((ctx, builder) -> {
                             WorldWarps.warpManager.getPublicWarps().forEach(w -> builder.suggest(w.getName()));
-                            WorldWarps.warpManager.getWarpsByOwner(ctx.getSource().getPlayer() != null ? ctx.getSource().getPlayer().getUuid() : UUID.fromString("CONSOLE")).forEach(w -> builder.suggest(w.getName()));
+                            WorldWarps.warpManager.getWarpsByOwner(ctx.getSource().getPlayer() != null ? ctx.getSource().getPlayer().getUuid() : CONSOLEID).forEach(w -> builder.suggest(w.getName()));
                             return builder.buildFuture();
                         })
                         .executes(ctx -> tpwarp(ctx.getSource(), StringArgumentType.getString(ctx, "name"))))
                 .then(literal("list")
                         .executes(ctx -> listWarps(ctx.getSource()))
+
                         .then(literal("public")
                                 .executes(ctx -> listWarps(ctx.getSource())))
+
                         .then(literal("personal")
-                                .executes(ctx -> listPWarps(ctx.getSource())))));
+                                .executes(ctx -> listOwnWarps(ctx.getSource()))))
+                .then(literal("info")
+                        .then(argument("name", StringArgumentType.word())
+                                .suggests((ctx, builder) -> {
+                                    WorldWarps.warpManager.getPublicWarps().forEach(w -> builder.suggest(w.getName()));
+                                    WorldWarps.warpManager.getWarpsByOwner(ctx.getSource().getPlayer() != null ? ctx.getSource().getPlayer().getUuid() : CONSOLEID).forEach(w -> builder.suggest(w.getName()));
+                                    if (CheckPermission(ctx.getSource())) {
+                                        WorldWarps.warpManager.getAllWarps().forEach(w -> builder.suggest(w.getName()));
+                                    }
+                                    return builder.buildFuture();
+                                })
+                                .executes(ctx -> {
+                                    if (CheckPermission(ctx.getSource())) {
+                                        return warpInfo(ctx.getSource(), StringArgumentType.getString(ctx, "name"));
+                                    } else {
+                                        Warp warp = WorldWarps.warpManager.getWarp(StringArgumentType.getString(ctx, "name"));
+                                        if (warp != null && (warp.isPublic() || (ctx.getSource().getPlayer() != null && warp.getOwner().equals(ctx.getSource().getPlayer().getUuid())))) {
+                                            return warpInfo(ctx.getSource(), StringArgumentType.getString(ctx, "name"));
+                                        } else {
+                                            return 1;
+                                        }
+                                    }
+                                }))));
 
         dispatcher.register(literal("warpmgr")
                 .then(literal("create")
                         .then(argument("name", StringArgumentType.word())
                                 .executes(ctx -> createWarp(ctx.getSource(), StringArgumentType.getString(ctx, "name"))))
+
                         .then(argument("name", StringArgumentType.word())
                                 .then(argument("x", DoubleArgumentType.doubleArg())
                                         .then(argument("y", DoubleArgumentType.doubleArg())
@@ -48,35 +79,75 @@ public class WarpCommand {
                                                                 .then(argument("pitch", FloatArgumentType.floatArg())
                                                                         .then(argument("world", DimensionArgumentType.dimension())
                                                                                 .suggests((ctx, builder) -> DimensionArgumentType.dimension().listSuggestions(ctx, builder)))
-                                                                        .requires(s -> s.hasPermissionLevel(2))
+                                                                        .requires(WarpCommand::CheckPermission)
                                                                         .executes(ctx -> createWarp(ctx.getSource(), StringArgumentType.getString(ctx, "name"),
                                                                                 DoubleArgumentType.getDouble(ctx, "x"), DoubleArgumentType.getDouble(ctx, "y"),
                                                                                 DoubleArgumentType.getDouble(ctx, "z"), FloatArgumentType.getFloat(ctx, "yaw"),
-                                                                                FloatArgumentType.getFloat(ctx, "pitch"), DimensionArgumentType.getDimensionArgument(ctx, "world").toString())))))))))
+                                                                                FloatArgumentType.getFloat(ctx, "pitch"), DimensionArgumentType.getDimensionArgument(ctx, "world").toString()))))))))
+
+                        .then(argument("name", StringArgumentType.word())
+                                .requires(WarpCommand::CheckPermission)
+                                .then(argument("owner", EntityArgumentType.entity())
+                                        .suggests((ctx, builder) -> EntityArgumentType.entity().listSuggestions(ctx, builder))
+                                        .then(argument("x", DoubleArgumentType.doubleArg())
+                                                .then(argument("y", DoubleArgumentType.doubleArg())
+                                                        .then(argument("z", DoubleArgumentType.doubleArg())
+                                                                .then(argument("yaw", FloatArgumentType.floatArg())
+                                                                        .then(argument("pitch", FloatArgumentType.floatArg())
+                                                                                .then(argument("world", DimensionArgumentType.dimension())
+                                                                                        .suggests((ctx, builder) -> DimensionArgumentType.dimension().listSuggestions(ctx, builder)))
+                                                                                .executes(ctx -> createWarp(ctx.getSource(), StringArgumentType.getString(ctx, "name"),
+                                                                                        EntityArgumentType.getEntity(ctx, "owner").getUuid(),
+                                                                                        DoubleArgumentType.getDouble(ctx, "x"), DoubleArgumentType.getDouble(ctx, "y"),
+                                                                                        DoubleArgumentType.getDouble(ctx, "z"), FloatArgumentType.getFloat(ctx, "yaw"),
+                                                                                        FloatArgumentType.getFloat(ctx, "pitch"), DimensionArgumentType.getDimensionArgument(ctx, "world").toString()))))))))))
+
+
                 .then(literal("remove")
                         .then(argument("name", StringArgumentType.word())
                                 .suggests((ctx, builder) -> {
-                                    WorldWarps.warpManager.getWarpsByOwner(ctx.getSource().getPlayer() != null ? ctx.getSource().getPlayer().getUuid() : UUID.fromString("CONSOLE")).forEach(w -> builder.suggest(w.getName()));
+                                    WorldWarps.warpManager.getWarpsByOwner(ctx.getSource().getPlayer() != null ? ctx.getSource().getPlayer().getUuid() : CONSOLEID).forEach(w -> builder.suggest(w.getName()));
                                     return builder.buildFuture();
                                 })
                                 .executes(ctx -> removeWarp(ctx.getSource(), StringArgumentType.getString(ctx, "name")))))
+
+
                 .then(literal("list")
                         .executes(ctx -> listWarps(ctx.getSource()))
                         .then(literal("public")
                                 .executes(ctx -> listWarps(ctx.getSource())))
+
                         .then(literal("personal")
-                                .executes(ctx -> listPWarps(ctx.getSource()))))
+                                .executes(ctx -> listOwnWarps(ctx.getSource()))
+                                .then(argument("entity", EntityArgumentType.entity())
+                                        .suggests((ctx, builder) -> EntityArgumentType.entity().listSuggestions(ctx, builder))
+                                        .executes(ctx -> {
+                                            if (EntityArgumentType.getEntity(ctx, "entity").getUuid() != null && CheckPermission(ctx.getSource())) {
+                                                return listPersonalWarps(ctx.getSource(), EntityArgumentType.getEntity(ctx, "entity").getUuid());
+                                            } else {
+                                                return listPublicWarpsbyOwner(ctx.getSource(), EntityArgumentType.getEntity(ctx, "entity").getUuid());
+                                            }
+                                        })))
+
+                        .then(literal("all")
+                                .requires(WarpCommand::CheckPermission)
+                                .executes(ctx -> listAllWarps(ctx.getSource())))
+                )
+
+
                 .then(literal("public")
                         .then(argument("name", StringArgumentType.word())
                                 .suggests((ctx, builder) -> {
-                                    WorldWarps.warpManager.getWarpsByOwner(ctx.getSource().getPlayer() != null ? ctx.getSource().getPlayer().getUuid() : UUID.fromString("CONSOLE")).forEach(w -> builder.suggest(w.getName()));
+                                    WorldWarps.warpManager.getWarpsByOwner(ctx.getSource().getPlayer() != null ? ctx.getSource().getPlayer().getUuid() : CONSOLEID).forEach(w -> builder.suggest(w.getName()));
                                     return builder.buildFuture();
                                 })
                                 .executes(ctx -> toggleWarpType(ctx.getSource(), StringArgumentType.getString(ctx, "name")))))
+
+
                 .then(literal("update")
                         .then(argument("name", StringArgumentType.word())
                                 .suggests((ctx, builder) -> {
-                                    WorldWarps.warpManager.getWarpsByOwner(ctx.getSource().getPlayer() != null ? ctx.getSource().getPlayer().getUuid() : UUID.fromString("CONSOLE")).forEach(w -> builder.suggest(w.getName()));
+                                    WorldWarps.warpManager.getWarpsByOwner(ctx.getSource().getPlayer() != null ? ctx.getSource().getPlayer().getUuid() : CONSOLEID).forEach(w -> builder.suggest(w.getName()));
                                     return builder.buildFuture();
                                 })
                                 .then(argument("x", DoubleArgumentType.doubleArg())
@@ -88,6 +159,7 @@ public class WarpCommand {
                                                                                 DoubleArgumentType.getDouble(ctx, "x"), DoubleArgumentType.getDouble(ctx, "y"),
                                                                                 DoubleArgumentType.getDouble(ctx, "z"), FloatArgumentType.getFloat(ctx, "yaw"),
                                                                                 FloatArgumentType.getFloat(ctx, "pitch"))))))))
+
                                 .then(argument("param", StringArgumentType.word())
                                         .suggests((ctx, builder) -> {
                                             builder.suggest("x");
@@ -215,6 +287,10 @@ public class WarpCommand {
                 ));
     }
 
+    private static boolean CheckPermission(ServerCommandSource source) {
+        return source.hasPermissionLevel(2);
+    }
+
 
     private int tpwarp(ServerCommandSource source, String name) {
         Warp warp = WorldWarps.warpManager.getWarp(name);
@@ -265,7 +341,7 @@ public class WarpCommand {
     }
 
     private int removeWarp(ServerCommandSource source, String name) {
-        WorldWarps.warpManager.removeWarp(name, source.getPlayer() != null ? source.getPlayer().getUuid() : UUID.fromString("CONSOLE"));
+        WorldWarps.warpManager.removeWarp(name, source.getPlayer() != null ? source.getPlayer().getUuid() : CONSOLEID);
         source.sendMessage(Text.of("Warp " + name + " removed"));
         return 0;
     }
@@ -276,21 +352,74 @@ public class WarpCommand {
         return 0;
     }
 
-    private int listPWarps(ServerCommandSource source) {
-        source.sendMessage(Text.of("Private warps:"));
-        WorldWarps.warpManager.getWarpsByOwner(source.getPlayer() != null ? source.getPlayer().getUuid() : UUID.fromString("CONSOLE")).forEach(w -> source.sendMessage(Text.of(w.getName())));
+    private int listPublicWarpsbyOwner(ServerCommandSource source, UUID owner) {
+        ServerPlayerEntity player = source.getServer().getPlayerManager().getPlayer(owner);
+        if (player != null) {
+            source.sendMessage(Text.of("Public warps of " + player.getName().getString() + ":"));
+        } else {
+            source.sendMessage(Text.of("Public warps of unknown:"));
+        }
+        WorldWarps.warpManager.getWarpsByOwner(owner).forEach(w -> {
+            if (w.isPublic()) source.sendMessage(Text.of(w.getName()));
+        });
+        return 0;
+    }
+
+    private int listOwnWarps(ServerCommandSource source) {
+        source.sendMessage(Text.of("Your warps:"));
+        WorldWarps.warpManager.getWarpsByOwner(source.getPlayer() != null ? source.getPlayer().getUuid() : CONSOLEID).forEach(w -> source.sendMessage(Text.of(w.getName())));
+        return 0;
+    }
+
+    private int listPersonalWarps(ServerCommandSource source, UUID owner) {
+        ServerPlayerEntity player = source.getServer().getPlayerManager().getPlayer(owner);
+        if (player != null) {
+            source.sendMessage(Text.of("Warps of " + player.getName().getString() + ":"));
+        } else {
+            source.sendMessage(Text.of("Warps of unknown:"));
+        }
+        WorldWarps.warpManager.getWarpsByOwner(owner).forEach(w -> source.sendMessage(Text.of(w.getName())));
+        return 0;
+    }
+
+    private int listAllWarps(ServerCommandSource source) {
+        List<Warp> warps = WorldWarps.warpManager.getAllWarps();
+        warps.sort(Comparator.comparing(Warp::getName));
+        source.sendMessage(Text.of("All warps:"));
+        warps.forEach(w -> source.sendMessage(Text.of(w.getName())));
+        return 0;
+    }
+
+    private int warpInfo(ServerCommandSource source, String name) {
+        Warp warp = WorldWarps.warpManager.getWarp(name);
+        if (warp != null) {
+            source.sendMessage(Text.of("Warp " + name + " info:"));
+            ServerPlayerEntity player = source.getServer().getPlayerManager().getPlayer(warp.getOwner());
+            if (player != null) {
+                source.sendMessage(Text.of("Owner: " + player.getName().getString()));
+            } else {
+                source.sendMessage(Text.of("Owner: unknown"));
+            }
+            source.sendMessage(Text.of("Public: " + (warp.isPublic() ? "yes" : "no")));
+            source.sendMessage(Text.of("Position: " + warp.getPos().x + " " + warp.getPos().y + " " + warp.getPos().z));
+            source.sendMessage(Text.of("Yaw: " + warp.getYaw()));
+            source.sendMessage(Text.of("Pitch: " + warp.getPitch()));
+            source.sendMessage(Text.of("World: " + warp.getWorld()));
+        } else {
+            source.sendMessage(Text.of("Warp not found"));
+        }
         return 0;
     }
 
     private int toggleWarpType(ServerCommandSource source, String name) {
-        WorldWarps.warpManager.toggleWarpType(name, source.getPlayer() != null ? source.getPlayer().getUuid() : UUID.fromString("CONSOLE"));
+        WorldWarps.warpManager.toggleWarpType(name, source.getPlayer() != null ? source.getPlayer().getUuid() : CONSOLEID);
         source.sendMessage(Text.of("Warp " + name + " is now " + (WorldWarps.warpManager.getWarp(name).isPublic() ? "public" : "private")));
         return 0;
     }
 
     private int updateWarp(ServerCommandSource source, String name, double x, double y, double z, float yaw, float pitch) {
         String world = source.getWorld().getRegistryKey().getValue().toString();
-        WorldWarps.warpManager.updateWarp(name, source.getPlayer() != null ? source.getPlayer().getUuid() : UUID.fromString("CONSOLE"), new Vec3d(x, y, z), yaw, pitch, world);
+        WorldWarps.warpManager.updateWarp(name, source.getPlayer() != null ? source.getPlayer().getUuid() : CONSOLEID, new Vec3d(x, y, z), yaw, pitch, world);
         source.sendMessage(Text.of("Warp " + name + " updated"));
         return 0;
     }

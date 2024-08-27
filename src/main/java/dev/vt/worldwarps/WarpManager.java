@@ -36,6 +36,10 @@ public class WarpManager extends PersistentState {
         return warps.stream().filter(w -> w.getName().equals(name)).findFirst().orElse(null);
     }
 
+    protected List<Warp> getAllWarps() {
+        return warps;
+    }
+
     public void toggleWarpType(String name, UUID owner) {
         Warp warp = getWarp(name);
         if (warp != null && warp.getOwner().equals(owner)) {
@@ -50,6 +54,7 @@ public class WarpManager extends PersistentState {
             warp.setPos(pos);
             warp.setYaw(yaw);
             warp.setPitch(pitch);
+            warp.setWorld(world);
         }
         this.markDirty();
     }
