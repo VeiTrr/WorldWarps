@@ -1,6 +1,6 @@
 modLoader = "javafml"
 loaderVersion = "[47,)"
-#issueTrackerURL = ""
+issueTrackerURL = "https://github.com/VeiTrr/WorldWarps/issues"
 license = "MIT"
 
 [[mods]]
@@ -9,7 +9,7 @@ version = "${version}"
 displayName = "WorldWarps"
 authors = "VeiTr"
 description = '''
-A simple mod that allows you to create warps to different locations in the world.
+A mod that allows you to create warps to different locations in the world.
 '''
 logoFile = "assets/worldwarps/icon.png"
 
