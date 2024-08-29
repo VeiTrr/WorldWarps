@@ -7,7 +7,7 @@ group = project.maven_group
 version = project.mod_version
 
 base {
-    archivesName = project.archives_name
+    archivesName = project.archives_name + "-v" + project.minecraft_version + "-forge"
 }
 
 loom {
