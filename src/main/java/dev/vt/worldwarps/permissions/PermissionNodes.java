@@ -19,7 +19,7 @@ public class PermissionNodes {
     );
 
     public static final PermissionNode<Boolean> CAN_CHANGE_TYPE = new PermissionNode<>(
-            new Identifier(WorldWarps.MODID, "can_set_public"),
+            new Identifier(WorldWarps.MODID, "can_change_type"),
             PermissionTypes.BOOLEAN,
             (player, playerUUID, context) -> true
     );
