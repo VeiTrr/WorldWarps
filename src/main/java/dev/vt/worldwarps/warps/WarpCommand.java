@@ -345,7 +345,7 @@ public class WarpCommand {
         if (source.getPlayer() != null) {
             if (warp != null) {
                 if (warp.isPublic() || warp.getOwner().equals(source.getPlayer().getUuid())) {
-                    RegistryKey<World> worldKey = RegistryKey.of(RegistryKeys.WORLD, new Identifier(warp.getWorld()));
+                    RegistryKey<World> worldKey = RegistryKey.of(RegistryKeys.WORLD, Identifier.of(warp.getWorld()));
                     ServerWorld world = source.getServer().getWorld(worldKey);
                     if (world != null) {
                         source.getPlayer().teleport(world, warp.getPos().x, warp.getPos().y, warp.getPos().z, warp.getYaw(), warp.getPitch());

@@ -13,31 +13,31 @@ public class PermissionNodes {
     private static String permissionLevelRequired = "requiredPermissionLevel: ";
 
     public static final PermissionNode<Boolean> CAN_WARP = new PermissionNode<>(
-            new Identifier(WorldWarps.MODID, "can_warp"),
+            Identifier.of(WorldWarps.MODID, "can_warp"),
             PermissionTypes.BOOLEAN,
             (player, playerUUID, context) -> true
     );
 
     public static final PermissionNode<Boolean> CAN_CHANGE_TYPE = new PermissionNode<>(
-            new Identifier(WorldWarps.MODID, "can_change_type"),
+            Identifier.of(WorldWarps.MODID, "can_change_type"),
             PermissionTypes.BOOLEAN,
             (player, playerUUID, context) -> true
     );
 
     public static final PermissionNode<Boolean> CAN_CREATE_WARP = new PermissionNode<>(
-            new Identifier(WorldWarps.MODID, "can_create_warp"),
+            Identifier.of(WorldWarps.MODID, "can_create_warp"),
             PermissionTypes.BOOLEAN,
             (player, playerUUID, context) -> true
     );
 
     public static final PermissionNode<Boolean> WARP_ADMIN = new PermissionNode<>(
-            new Identifier(WorldWarps.MODID, "warp_admin"),
+            Identifier.of(WorldWarps.MODID, "warp_admin"),
             PermissionTypes.BOOLEAN,
             (player, playerUUID, context) -> false
     );
 
     public static final PermissionNode<Integer> WARP_LIMIT = new PermissionNode<>(
-            new Identifier(WorldWarps.MODID, "warp_limit"),
+            Identifier.of(WorldWarps.MODID, "warp_limit"),
             PermissionTypes.INTEGER,
             (player, playerUUID, context) -> 5
     );
