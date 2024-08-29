@@ -2,6 +2,7 @@ package dev.vt.worldwarps.warps;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.PersistentState;
@@ -61,7 +62,7 @@ public class WarpManager extends PersistentState {
 
 
     @Override
-    public NbtCompound writeNbt(NbtCompound nbt) {
+    public NbtCompound writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         NbtList warpList = new NbtList();
         warps.forEach(w -> {
             NbtCompound warpNbt = new NbtCompound();
@@ -80,7 +81,7 @@ public class WarpManager extends PersistentState {
         return nbt;
     }
 
-    private static WarpManager fromNbt(NbtCompound nbt) {
+    private static WarpManager fromNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         WarpManager manager = new WarpManager();
         NbtList warpList = nbt.getList("warps", 10);
         for (int i = 0; i < warpList.size(); i++) {
