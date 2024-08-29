@@ -1,3 +1,7 @@
+[![CurseForge Downloads](https://img.shields.io/curseforge/dt/1093051?style=for-the-badge&logo=curseforge&logoColor=%230d0d0d&labelColor=%23f16436&color=%230d0d0d)](https://www.curseforge.com/minecraft/mc-mods/worldwarps)
+[![Modrinth Downloads](https://img.shields.io/modrinth/dt/eYfW6K2F?style=for-the-badge&logo=modrinth&color=%231bd96a)](https://modrinth.com/mod/worldwarps)
+
+
 # WorldWarps
 
 WorldWarps is a Minecraft mod designed to manage warp points in the game, allowing players to create, remove, and teleport to various locations. This mod is especially useful for servers where players need to quickly navigate between different areas.
