@@ -100,6 +100,6 @@ public class WarpManager extends PersistentState {
     }
 
     public static WarpManager getWarpManager(ServerWorld world) {
-        return world.getPersistentStateManager().getOrCreate(WarpManager::fromNbt, WarpManager::new, "warps");
+        return world.getPersistentStateManager().getOrCreate(new PersistentState.Type<>(WarpManager::new, WarpManager::fromNbt, null), "warps");
     }
 }
