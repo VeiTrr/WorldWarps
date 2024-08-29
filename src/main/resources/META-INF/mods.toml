@@ -11,7 +11,7 @@ authors = "VeiTr"
 description = '''
 A simple mod that allows you to create warps to different locations in the world.
 '''
-#logoFile = ""
+logoFile = "assets/worldwarps/icon.png"
 
 [[dependencies.worldwarps]]
 modId = "forge"

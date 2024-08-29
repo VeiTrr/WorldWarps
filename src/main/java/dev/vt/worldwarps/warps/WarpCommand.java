@@ -120,7 +120,8 @@ public class WarpCommand {
                                         return removeWarp(ctx.getSource(), StringArgumentType.getString(ctx, "name"));
                                     } else {
                                         Warp warp = WorldWarps.getWarpManager().getWarp(StringArgumentType.getString(ctx, "name"));
-                                        if (warp != null && warp.getOwner().equals(ctx.getSource().getPlayer().getUuid())) {
+
+                                        if (warp != null && ctx.getSource().getPlayer() != null && warp.getOwner().equals(ctx.getSource().getPlayer().getUuid())) {
                                             return removeWarp(ctx.getSource(), StringArgumentType.getString(ctx, "name"));
                                         } else {
                                             return 1;
@@ -168,7 +169,7 @@ public class WarpCommand {
                                         return toggleWarpType(ctx.getSource(), StringArgumentType.getString(ctx, "name"));
                                     } else {
                                         Warp warp = WorldWarps.getWarpManager().getWarp(StringArgumentType.getString(ctx, "name"));
-                                        if (warp != null && warp.getOwner().equals(ctx.getSource().getPlayer().getUuid())) {
+                                        if (warp != null && ctx.getSource().getPlayer() != null && warp.getOwner().equals(ctx.getSource().getPlayer().getUuid())) {
                                             return toggleWarpType(ctx.getSource(), StringArgumentType.getString(ctx, "name"));
                                         } else {
                                             return 1;
@@ -196,7 +197,7 @@ public class WarpCommand {
                                                                                         FloatArgumentType.getFloat(ctx, "pitch"));
                                                                             } else {
                                                                                 Warp warp = WorldWarps.getWarpManager().getWarp(StringArgumentType.getString(ctx, "name"));
-                                                                                if (warp != null && warp.getOwner().equals(ctx.getSource().getPlayer().getUuid())) {
+                                                                                if (warp != null && ctx.getSource().getPlayer() != null && warp.getOwner().equals(ctx.getSource().getPlayer().getUuid())) {
                                                                                     return updateWarp(ctx.getSource(), StringArgumentType.getString(ctx, "name"),
                                                                                             DoubleArgumentType.getDouble(ctx, "x"), DoubleArgumentType.getDouble(ctx, "y"),
                                                                                             DoubleArgumentType.getDouble(ctx, "z"), FloatArgumentType.getFloat(ctx, "yaw"),
