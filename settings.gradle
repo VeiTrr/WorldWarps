@@ -8,3 +8,7 @@ pluginManagement {
 }
 
 rootProject.name = 'worldwarps'
+
+include 'common'
+include 'fabric'
+include 'forge'

@@ -1,11 +1,12 @@
-package dev.vt.worldwarps.permissions;
+package vt.worldwarps.forge.permissions;
 
-import dev.vt.worldwarps.WorldWarps;
-import dev.vt.worldwarps.config.ModConfig;
+
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraftforge.server.permission.nodes.PermissionNode;
 import net.minecraftforge.server.permission.nodes.PermissionTypes;
+import vt.worldwarps.WorldWarps;
+import vt.worldwarps.forge.config.ModConfig;
 
 import java.util.List;
 

@@ -1,9 +1,6 @@
-package dev.vt.worldwarps;
+package vt.worldwarps.forge;
 
 import com.mojang.logging.LogUtils;
-import dev.vt.worldwarps.permissions.PermissionNodes;
-import dev.vt.worldwarps.warps.WarpCommand;
-import dev.vt.worldwarps.warps.WarpManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
@@ -16,17 +13,20 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.server.permission.events.PermissionGatherEvent;
 import org.slf4j.Logger;
+import vt.worldwarps.WorldWarps;
+import vt.worldwarps.forge.permissions.PermissionNodes;
+import vt.worldwarps.forge.warps.WarpCommand;
+import vt.worldwarps.forge.warps.WarpManager;
 
 @Mod(WorldWarps.MODID)
-public class WorldWarps {
-    public static final String MODID = "worldwarps";
+public class WorldWarpsForge {
     protected static final Logger LOGGER = LogUtils.getLogger();
     protected static WarpManager warpManager;
 
-    public WorldWarps() {
+    public WorldWarpsForge() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         MinecraftForge.EVENT_BUS.register(this);
-        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, dev.vt.worldwarps.config.ModConfig.CONFIG, "worldwarps-server.toml");
+        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, vt.worldwarps.forge.config.ModConfig.CONFIG, "worldwarps-server.toml");
     }
 
     @SubscribeEvent

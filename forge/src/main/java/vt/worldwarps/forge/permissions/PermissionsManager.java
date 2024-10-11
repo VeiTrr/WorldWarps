@@ -1,11 +1,12 @@
-package dev.vt.worldwarps.permissions;
+package vt.worldwarps.forge.permissions;
 
-import dev.vt.worldwarps.config.ModConfig;
+
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraftforge.server.permission.PermissionAPI;
 import net.minecraftforge.server.permission.nodes.PermissionNode;
 import net.minecraftforge.server.permission.nodes.PermissionTypes;
+import vt.worldwarps.forge.config.ModConfig;
 
 public class PermissionsManager {
 

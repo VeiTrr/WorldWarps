@@ -1,10 +1,10 @@
-package dev.vt.worldwarps.config;
+package vt.worldwarps.forge.config;
 
-import dev.vt.worldwarps.WorldWarps;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
+import vt.worldwarps.WorldWarps;
 
 @Mod.EventBusSubscriber(modid = WorldWarps.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ModConfig {

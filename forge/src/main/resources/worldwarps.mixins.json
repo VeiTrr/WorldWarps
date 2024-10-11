@@ -1,7 +1,7 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "dev.vt.worldwarps.mixin",
+  "package": "vt.worldwarps.forge.mixin",
   "compatibilityLevel": "JAVA_17",
   "refmap": "worldwarps.refmap.json",
   "mixins": [
